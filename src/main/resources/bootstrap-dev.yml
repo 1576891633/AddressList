@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    zookeeper:
+      enabled: true
+      connectString: 192.168.56.120:2181
+      config:
+        enabled: true
+        root: /configurations/microserver
+        defaultContext: commonconfig
+        profileSeparator: ','
+    inetutils:
+      preferredNetworks:
+        - 192.168.1
+        - 192.168

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: hydropower-portal-service
+  profiles:
+    active: dev
+encrypt:
+  failOnError: false
+logging.level.com.lensyn.usercenter.security.client.service.auth: debug
