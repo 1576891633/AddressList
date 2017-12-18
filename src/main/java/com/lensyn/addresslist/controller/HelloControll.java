@@ -5,6 +5,6 @@ package com.lensyn.addresslist.controller;
  */
 public class HelloControll {
     public static void mian(String [] args){
-       System.out.println("hello girl");
+       System.out.println("hello girl,i am lizhongfu");
     }
 }
