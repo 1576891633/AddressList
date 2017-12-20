@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hydropower-portal-service
+    name: AddressList
   profiles:
     active: dev
 encrypt:
