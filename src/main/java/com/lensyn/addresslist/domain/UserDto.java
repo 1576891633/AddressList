@@ -14,8 +14,7 @@ public class UserDto {
     private String email;            /*邮件*/
     private String identityCard;     /*身份证*/
     private String info;             /*详情*/
-    private String orgName;          /*组织名称*/
-    private String orgCode;          /*组织编码*/
+    private String enterpriseOrgId;  /*组织ID*/
     private String account;          /*用户账号，用于更新数据的定位*/
 
     public String getUserName() {
@@ -74,27 +73,19 @@ public class UserDto {
         this.info = info;
     }
 
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
     public String getAccount() {
         return account;
     }
 
     public void setAccount(String account) {
         this.account = account;
+    }
+
+    public String getEnterpriseOrgId() {
+        return enterpriseOrgId;
+    }
+
+    public void setEnterpriseOrgId(String enterpriseOrgId) {
+        this.enterpriseOrgId = enterpriseOrgId;
     }
 }

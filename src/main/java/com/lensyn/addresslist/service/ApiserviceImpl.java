@@ -1,9 +1,12 @@
 package com.lensyn.addresslist.service;
 
+import com.lensyn.addresslist.entity.PageRequest;
 import com.lensyn.common.utils.system.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Created by lizhongfu on 14:40 2017/12/18
@@ -15,67 +18,25 @@ public class ApiserviceImpl implements ApiService {
     private Logger log = LoggerFactory.getLogger(ApiserviceImpl.class);
 
     @Override
-    public Response getAddressListByOrgCode(String orgCode) {
-        log.error("通过组织Code获取通讯录失败");
-        return new Response().failure("通过组织Code获取通讯录失败");
-    }
-
-    @Override
     public Response addressList() {
-        log.error("获取通讯录失败");
-        return new Response().failure("获取通讯录失败");
+        return null;
+    }
+
+    /*@Override
+    public Response getAddressList(String userName, String orgName, Integer enterpriseOrgId, String telephone,
+                                   String position, String email, Integer page, Integer rows) {
+        log.error("查找通讯录失败");
+        return new Response().failure("查找通讯录失败");
+    }*/
+
+    @Override
+    public Response getAddressList(PageRequest pageRequest) {
+        log.error("查找通讯录失败");
+        return new Response().failure("查找通讯录失败");
     }
 
     @Override
-    public Response getAddressListByUserName(String userName) {
-        log.error("通过用户名获取通讯录失败");
-        return new Response().failure("通过用户名获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByAccount(String account) {
-        log.error("通过账户获取通讯录失败");
-        return new Response().failure("通过账户获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByAccountType(String accountType) {
-        log.error("通过账户类型获取通讯录失败");
-        return new Response().failure("通过账户类型获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByCurStatus(String curStatus) {
-        log.error("通过当前状态获取通讯录失败");
-        return new Response().failure("通过当前状态获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByTelephone(String telephone) {
-        log.error("通过电话获取通讯录失败");
-        return new Response().failure("通过电话获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByIdentityCard(String identityCard) {
-        log.error("通过身份证获取通讯录失败");
-        return new Response().failure("通过身份证获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByPosition(String position) {
-       log.error("通过职位获取通讯录失败");
-       return new Response().failure("通过职位获取通讯录失败");
-    }
-
-    @Override
-    public Response getAddressListByEmail(String email) {
-        log.error("通过邮件获取通讯录失败");
-        return new Response().failure("通过邮件获取通讯录失败");
-    }
-
-    @Override
-    public Response updateAddressList(String userName, String telephone, String position, String sex, String email, String identityCard, String info, String orgName, String orgCode, String account) {
+    public Response updateAddressList(String userName, String telephone, Integer sex, String email, String identityCard, String info, Integer enterpriseOrgId, String account) {
         log.error("更新通讯录失败");
         return new Response().failure("更新通讯录失败");
     }
@@ -96,5 +57,18 @@ public class ApiserviceImpl implements ApiService {
     public Response getRolesByAccount(String account) {
         log.error("获取用户角色信息失败!");
         return new Response().failure("获取用户角色信息失败!");
+    }
+
+    @Override
+    public Response getResourcesTree(String clientId, Integer resType) {
+        log.error("获取资源树失败!");
+        return new Response().failure("获取资源树失败!");
+    }
+
+    @Override
+    public Response getOrgTreeByOrgCode(String orgCode) {
+        String message = "orgCode:" + orgCode + ",获取组织信息树失败!";
+        log.error(message);
+        return new Response().failure(message);
     }
 }
