@@ -1,26 +1,27 @@
 package com.lensyn.addresslist.controller;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.lensyn.addresslist.domain.Accounts;
 import com.lensyn.addresslist.domain.UserDto;
-import com.lensyn.addresslist.entity.PageRequest;
 import com.lensyn.addresslist.entity.User;
 import com.lensyn.addresslist.entity.vo.OrganizationVo;
 import com.lensyn.addresslist.service.ApiService;
+import com.lensyn.addresslist.system.util.ExcelExportUtil;
 import com.lensyn.addresslist.system.util.GsonUtil;
 import com.lensyn.common.utils.system.response.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -37,33 +38,42 @@ public class AddressListController {
     private Gson gson = GsonUtil.getGson();
 
     /**
-     * 通过通讯录属性查找通讯录信息
+     * 导出excel表格
+     * @return
+     */
+    @ApiOperation(value = "导出excel表格")
+    @GetMapping(value = "/excel/export")
+    public Response ExportExcel(String userName, String orgName, String orgCode,
+                                String telephone, String email, HttpServletResponse httpServletResponse) {
+
+        ExcelExportUtil pee = new ExcelExportUtil("sheet");
+        Response response = apiService.getAddressList(userName,orgName,orgCode,telephone,email);
+        Object object = response.getData();
+        String result = gson.toJson(object);
+        Accounts accounts = gson.fromJson(result, Accounts.class);
+        List<UserDto> dataList = accounts.getRows();
+        String titleColumn[] = {"userName","orgName","telephone","email"};
+        String titleName[] = {"用户名","部门","电话","邮箱"};
+        int titleSize[] = {13,13,13,13};
+        //其他设置 set方法可全不调用
+        String colFormula[] = new String[4];
+        colFormula[3] = "D@*12";   //设置第4列的公式
+        pee.setColFormula(colFormula);
+        pee.setAddress("A:D");  //自动筛选
+        pee.wirteExcel(titleColumn, titleName, titleSize, dataList, httpServletResponse);
+        return new Response().success("导出excel成功");
+    }
+
+    /**
+     * 通过通讯录属性查找通讯录信息,page和size放在头信息header里面
      *
      * @param
      * @return
      */
-    @ApiOperation(value = "通过通讯录属性和组织Id查找通讯录信息")
+    @ApiOperation(value = "通过通讯录属性查找通讯录信息")
     @GetMapping(value = "/enterprise/accounts")
-    public Response getAddressList(@ApiParam(value = "用户名", required = true) @RequestParam(value = "userName") String userName,
-                                   @ApiParam(value = "组织名称", required = true) @RequestParam(value = "orgName") String orgName,
-                                   @ApiParam(value = "组织Id", required = true) @RequestParam(value = "enterpriseOrgId") String enterpriseOrgId,
-                                   @ApiParam(value = "电话号码", required = true) @RequestParam(value = "telephone") String telephone,
-                                   @ApiParam(value = "职位", required = true) @RequestParam(value = "position") String position,
-                                   @ApiParam(value = "邮件", required = true) @RequestParam(value = "email") String email,
-                                   @ApiParam(value = "当前页", required = true) @RequestParam(value = "page") Integer page,
-                                   @ApiParam(value = "每页数据量", required = true) @RequestParam(value = "rows") Integer rows) {
-
-        Map<String,String[]> conditions = new HashMap<>();
-        String[] userName1 = {userName};
-        conditions.put("userName",userName1);
-        String[] enterpriseOrgId1 = {enterpriseOrgId};
-        conditions.put("enterpriseOrgId",enterpriseOrgId1);
-        PageRequest pageRequest = new PageRequest();
-        pageRequest.setConditions(conditions);
-        pageRequest.setPage(page);
-        pageRequest.setRows(rows);
-
-        Response response = apiService.getAddressList(pageRequest);
+    public Response getAddressList(String userName, String orgName, String orgCode, String telephone, String email) {
+        Response response = apiService.getAddressList(userName,orgName,orgCode,telephone,email);
         return response;
     }
 
@@ -73,10 +83,11 @@ public class AddressListController {
      * @param
      * @return
      */
-    @ApiOperation(value = "获取企业组织，在前端异步加载相关组织通讯录")
-    @GetMapping(value = "/enterprise/orgs")
+    @ApiOperation(value = "获取企业组织树，在前端异步加载相关组织通讯录")
+    @GetMapping(value = "/enterprise/orgs/tree")
     public Response getOrgTree() {
         Response response = apiService.getOrgTree();
+        /*生成Json树形结构*/
         /*List<OrganizationVo> organizationVos = gson.fromJson(gson.toJson(response.getData()), new TypeToken<ArrayList<OrganizationVo>>() {
         }.getType());
         OrganizationVo organizationVo = buildTree(organizationVos);*/
@@ -84,7 +95,7 @@ public class AddressListController {
     }
 
     /**
-     * 生成树型结构的json数据
+     * 生成树型结构的json数据,暂时没用，返回来就是树形结构了
      * @param nodes
      * @return
      */
@@ -98,7 +109,6 @@ public class AddressListController {
             String pid = children.getParentCode();
             if (pid == null || "".equals(pid)) {
                 topNodes.add(children);
-
                 continue;
             }
 
@@ -130,16 +140,14 @@ public class AddressListController {
      */
     @ApiOperation(value = "修改通讯录信息")
     @PatchMapping(value = "/enterprise/accounts/update")
-    public Response updateAddressList(@ApiParam(value = "姓名") @PathVariable(value = "userName") String userName,
-                                      @ApiParam(value = "电话") @PathVariable(value = "telephone") String telephone,
-                                      @ApiParam(value = "性别") @PathVariable(value = "sex") Integer sex,
-                                      @ApiParam(value = "邮件") @PathVariable(value = "email") String email,
-                                      @ApiParam(value = "身份证") @PathVariable(value = "identityCard") String identityCard,
-                                      @ApiParam(value = "详情") @PathVariable(value = "info") String info,
-                                      @ApiParam(value = "组织编码") @PathVariable(value = "orgCode") Integer enterpriseOrgId,
-                                      @ApiParam(value = "用户账号，用于sql判断") @PathVariable(value = "account") String account) {
+    public Response updateAddressList(@ApiParam(value = "姓名") @RequestParam(value = "userName") String userName,
+                                      @ApiParam(value = "电话") @RequestParam(value = "telephone") String telephone,
+                                      @ApiParam(value = "邮件") @RequestParam(value = "email") String email,
+                                      @ApiParam(value = "组织名称") @RequestParam(value = "orgName") String orgName,
+                                      @ApiParam(value = "组织编码") @RequestParam(value = "orgCode") String orgCode,
+                                      @ApiParam(value = "用户账号，用于sql判断") @RequestParam(value = "account") String account) {
 
-             Response response = apiService.updateAddressList(userName, telephone, sex, email, identityCard, info, enterpriseOrgId, account);
+             Response response = apiService.updateAddressList(userName, telephone, email, orgName, orgCode, account);
              return response.success("修改通讯录成功");
     }
 

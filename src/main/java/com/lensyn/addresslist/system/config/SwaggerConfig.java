@@ -106,7 +106,7 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.lensyn.hydropower.portal.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.lensyn.addresslist.controller"))
                 .build()
                 .securitySchemes(newArrayList(oauth()))
                 .securityContexts(newArrayList(securityContext()));

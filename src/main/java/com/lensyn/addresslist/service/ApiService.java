@@ -1,17 +1,12 @@
 package com.lensyn.addresslist.service;
 
-import com.lensyn.addresslist.entity.PageRequest;
 import com.lensyn.common.utils.system.response.Response;
 import com.lensyn.usercenter.security.client.system.config.UserCenterApiFeignConfiguration;
 import com.lensyn.usercenter.security.client.system.constants.FeignConstants;
+import com.netflix.ribbon.proxy.annotation.Http;
+import feign.Headers;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by lizhongfu on 14:35 2017/12/18
@@ -19,13 +14,6 @@ import java.util.Map;
  */
 @FeignClient(name = FeignConstants.USERCENTER_API_NAME, configuration = UserCenterApiFeignConfiguration.class, fallback = ApiserviceImpl.class)
 public interface ApiService {
-    /**
-     * 获取通讯录信息
-     *
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET, value ="/addressList" )
-    Response addressList();
 
     /**
      * 通过通讯录属性查找通讯录信息
@@ -33,7 +21,11 @@ public interface ApiService {
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value ="/enterprise/accounts")
-    Response getAddressList(PageRequest pageRequest);
+    Response getAddressList(@RequestParam(value = "userName") String userName,
+                             @RequestParam(value = "orgName") String orgName,
+                             @RequestParam(value = "orgCode") String orgCode,
+                             @RequestParam(value = "telephone") String telephone,
+                             @RequestParam(value = "email") String email);
 
     /**
      * 修改一条通讯录信息
@@ -43,11 +35,9 @@ public interface ApiService {
     @RequestMapping(method = RequestMethod.PATCH, value ="/enterprise/accounts/update")
     Response updateAddressList(@RequestParam(value = "userName") String userName,
                                @RequestParam(value = "telephone") String telephone,
-                               @RequestParam(value = "sex") Integer sex,
                                @RequestParam(value = "email") String email,
-                               @RequestParam(value = "identityCard") String identityCard,
-                               @RequestParam(value = "info") String info,
-                               @RequestParam(value = "orgCode") Integer enterpriseOrgId,
+                               @RequestParam(value = "orgName") String orgName,
+                               @RequestParam(value = "orgCode") String orgCode,
                                @RequestParam(value = "account") String account);
 
     /**
@@ -69,20 +59,7 @@ public interface ApiService {
      * @param
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value ="/enterprise/orgs")
+    @RequestMapping(method = RequestMethod.GET, value ="/enterprise/orgs/tree")
     Response getOrgTree();
-
-    /**
-     * 获取树形菜单
-     *
-     * @param clientId 应用ID
-     * @return 树形数据
-     */
-    @RequestMapping(method = RequestMethod.GET, value = "/resources/tree")
-    Response getResourcesTree(@RequestParam("clientId") String clientId,
-                              @RequestParam("resType") Integer resType);
-
-    @RequestMapping(value = "/enterprise/orgs/{orgCode}/root_tree", method = RequestMethod.GET)
-    Response getOrgTreeByOrgCode(@PathVariable(value = "orgCode") String orgCode);
 
 }
